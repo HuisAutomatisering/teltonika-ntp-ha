@@ -1,4 +1,8 @@
-"""Config flow for the Teltonika NTP Server integration."""
+"""Config flow for the Teltonika NTP Server integration.
+
+The flow structure (user, DHCP discovery, reauthentication) is based on the config flow of
+the Home Assistant core Teltonika integration (Apache License 2.0).
+"""
 
 from __future__ import annotations
 

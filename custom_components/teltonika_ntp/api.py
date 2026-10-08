@@ -3,7 +3,9 @@
 The login and session handling follow the approach of the teltasync library by
 Karl Beecken (Apache License 2.0), which powers the core "teltonika" integration.
 It is reimplemented here with plain aiohttp so this custom integration does not pin
-a library version that Home Assistant core also depends on.
+a library version that Home Assistant core also depends on. ``normalize_url`` and
+``url_variants`` are based on the util module of the Home Assistant core Teltonika
+integration (Apache License 2.0).
 """
 
 from __future__ import annotations

@@ -102,6 +102,10 @@ The RutOS login and session handling follow the approach of
 library behind the core Teltonika integration. It is reimplemented here with plain aiohttp,
 so this integration has no extra requirements.
 
+The URL handling (HTTPS first, HTTP fallback) and the structure of the config flow are based
+on the [Home Assistant core Teltonika integration](https://github.com/home-assistant/core/tree/dev/homeassistant/components/teltonika)
+(Apache License 2.0).
+
 The Teltonika icons come from the
 [home-assistant/brands](https://github.com/home-assistant/brands) repository. Teltonika is a
 trademark of its owner; this project is not affiliated with Teltonika.
