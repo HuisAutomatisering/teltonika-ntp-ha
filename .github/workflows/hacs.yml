@@ -1,0 +1,25 @@
+name: HACS
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    - cron: "0 4 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: HACS validation
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v7
+
+      - name: Run HACS validation
+        uses: hacs/action@main
+        with:
+          category: integration
