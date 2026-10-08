@@ -1,0 +1,101 @@
+{
+  "config": {
+    "flow_title": "{name} ({host})",
+    "step": {
+      "user": {
+        "title": "Set up a Teltonika NTP server",
+        "description": "Enter the address and WebUI credentials of your Teltonika NTP server (for example the NTP001).",
+        "data": {
+          "host": "Host",
+          "username": "Username",
+          "password": "Password",
+          "verify_ssl": "Verify SSL certificate"
+        },
+        "data_description": {
+          "host": "IP address or host name. HTTPS is tried first, then HTTP.",
+          "username": "A WebUI user. A dedicated read-only user for Home Assistant is recommended.",
+          "password": "Password of that user.",
+          "verify_ssl": "Leave off for the device's default self-signed certificate."
+        }
+      },
+      "dhcp_confirm": {
+        "title": "Teltonika NTP server discovered",
+        "description": "{name} was found at {host}. Enter its WebUI credentials to add it.",
+        "data": {
+          "username": "Username",
+          "password": "Password"
+        },
+        "data_description": {
+          "username": "A WebUI user. A dedicated read-only user for Home Assistant is recommended.",
+          "password": "Password of that user."
+        }
+      },
+      "reauth_confirm": {
+        "title": "Log in to {name} again",
+        "description": "The device at {host} rejected the stored credentials.",
+        "data": {
+          "username": "Username",
+          "password": "Password"
+        }
+      },
+      "reconfigure": {
+        "title": "Reconfigure Teltonika NTP server",
+        "data": {
+          "host": "Host",
+          "username": "Username",
+          "password": "Password",
+          "verify_ssl": "Verify SSL certificate"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Cannot connect to the device.",
+      "invalid_auth": "Invalid username or password.",
+      "unknown": "Unexpected error, see the logs."
+    },
+    "abort": {
+      "already_configured": "This device is already configured.",
+      "cannot_connect": "Cannot connect to the device.",
+      "not_supported": "This Teltonika device is not an NTP server. Use the built-in Teltonika integration for routers.",
+      "wrong_device": "These details belong to a different device.",
+      "reauth_successful": "Credentials updated.",
+      "reconfigure_successful": "Configuration updated."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "synchronization": {
+        "name": "Synchronization",
+        "state": {
+          "synchronized": "Synchronized",
+          "unsynchronized": "Not synchronized",
+          "rate_limited": "Rate limited",
+          "no_response": "No response"
+        }
+      },
+      "stratum": {
+        "name": "Stratum"
+      },
+      "reference": {
+        "name": "Reference"
+      },
+      "offset": {
+        "name": "Offset"
+      },
+      "round_trip_delay": {
+        "name": "Round-trip delay"
+      },
+      "root_dispersion": {
+        "name": "Root dispersion"
+      }
+    },
+    "binary_sensor": {
+      "ntp_service": {
+        "name": "NTP service"
+      },
+      "time_problem": {
+        "name": "Time sync"
+      }
+    }
+  }
+}

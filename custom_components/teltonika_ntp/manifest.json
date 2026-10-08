@@ -1,0 +1,20 @@
+{
+  "domain": "teltonika_ntp",
+  "name": "Teltonika NTP Server",
+  "codeowners": ["@HuisAutomatisering"],
+  "config_flow": true,
+  "dhcp": [
+    {
+      "macaddress": "209727*"
+    },
+    {
+      "macaddress": "001E42*"
+    }
+  ],
+  "documentation": "https://github.com/HuisAutomatisering/teltonika-ntp-ha",
+  "integration_type": "device",
+  "iot_class": "local_polling",
+  "issue_tracker": "https://github.com/HuisAutomatisering/teltonika-ntp-ha/issues",
+  "requirements": [],
+  "version": "1.0.0"
+}

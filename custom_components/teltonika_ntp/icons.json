@@ -1,0 +1,34 @@
+{
+  "entity": {
+    "sensor": {
+      "synchronization": {
+        "default": "mdi:clock-check-outline",
+        "state": {
+          "unsynchronized": "mdi:clock-alert-outline",
+          "rate_limited": "mdi:timer-sand",
+          "no_response": "mdi:clock-remove-outline"
+        }
+      },
+      "stratum": {
+        "default": "mdi:layers-triple-outline"
+      },
+      "reference": {
+        "default": "mdi:satellite-variant"
+      },
+      "offset": {
+        "default": "mdi:plus-minus-variant"
+      },
+      "round_trip_delay": {
+        "default": "mdi:timer-outline"
+      },
+      "root_dispersion": {
+        "default": "mdi:chart-bell-curve"
+      }
+    },
+    "binary_sensor": {
+      "ntp_service": {
+        "default": "mdi:server-network"
+      }
+    }
+  }
+}

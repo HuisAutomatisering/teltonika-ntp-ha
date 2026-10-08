@@ -1,0 +1,101 @@
+{
+  "config": {
+    "flow_title": "{name} ({host})",
+    "step": {
+      "user": {
+        "title": "Teltonika NTP-server instellen",
+        "description": "Vul het adres en de WebUI-inloggegevens van je Teltonika NTP-server in (bijvoorbeeld de NTP001).",
+        "data": {
+          "host": "Host",
+          "username": "Gebruikersnaam",
+          "password": "Wachtwoord",
+          "verify_ssl": "SSL-certificaat controleren"
+        },
+        "data_description": {
+          "host": "IP-adres of hostnaam. Eerst wordt HTTPS geprobeerd, daarna HTTP.",
+          "username": "Een WebUI-gebruiker. Een aparte alleen-lezen gebruiker voor Home Assistant is aan te raden.",
+          "password": "Wachtwoord van die gebruiker.",
+          "verify_ssl": "Laat uit voor het standaard self-signed certificaat van het apparaat."
+        }
+      },
+      "dhcp_confirm": {
+        "title": "Teltonika NTP-server gevonden",
+        "description": "{name} is gevonden op {host}. Vul de WebUI-inloggegevens in om hem toe te voegen.",
+        "data": {
+          "username": "Gebruikersnaam",
+          "password": "Wachtwoord"
+        },
+        "data_description": {
+          "username": "Een WebUI-gebruiker. Een aparte alleen-lezen gebruiker voor Home Assistant is aan te raden.",
+          "password": "Wachtwoord van die gebruiker."
+        }
+      },
+      "reauth_confirm": {
+        "title": "Opnieuw inloggen bij {name}",
+        "description": "Het apparaat op {host} weigert de opgeslagen inloggegevens.",
+        "data": {
+          "username": "Gebruikersnaam",
+          "password": "Wachtwoord"
+        }
+      },
+      "reconfigure": {
+        "title": "Teltonika NTP-server opnieuw instellen",
+        "data": {
+          "host": "Host",
+          "username": "Gebruikersnaam",
+          "password": "Wachtwoord",
+          "verify_ssl": "SSL-certificaat controleren"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Kan geen verbinding maken met het apparaat.",
+      "invalid_auth": "Ongeldige gebruikersnaam of wachtwoord.",
+      "unknown": "Onverwachte fout, zie de logs."
+    },
+    "abort": {
+      "already_configured": "Dit apparaat is al ingesteld.",
+      "cannot_connect": "Kan geen verbinding maken met het apparaat.",
+      "not_supported": "Dit Teltonika-apparaat is geen NTP-server. Gebruik de ingebouwde Teltonika-integratie voor routers.",
+      "wrong_device": "Deze gegevens horen bij een ander apparaat.",
+      "reauth_successful": "Inloggegevens bijgewerkt.",
+      "reconfigure_successful": "Configuratie bijgewerkt."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "synchronization": {
+        "name": "Synchronisatie",
+        "state": {
+          "synchronized": "Gesynchroniseerd",
+          "unsynchronized": "Niet gesynchroniseerd",
+          "rate_limited": "Rate limit",
+          "no_response": "Geen antwoord"
+        }
+      },
+      "stratum": {
+        "name": "Stratum"
+      },
+      "reference": {
+        "name": "Referentie"
+      },
+      "offset": {
+        "name": "Offset"
+      },
+      "round_trip_delay": {
+        "name": "Round-trip vertraging"
+      },
+      "root_dispersion": {
+        "name": "Root-dispersie"
+      }
+    },
+    "binary_sensor": {
+      "ntp_service": {
+        "name": "NTP-dienst"
+      },
+      "time_problem": {
+        "name": "Tijdsynchronisatie"
+      }
+    }
+  }
+}
