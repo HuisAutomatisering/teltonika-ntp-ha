@@ -33,7 +33,9 @@ async def test_setup_and_unload(
     await hass.async_block_till_done()
     assert mock_config_entry.state is ConfigEntryState.LOADED
 
-    device = dr.async_get(hass).async_get_device_by_identifier((DOMAIN, SERIAL))
+    device = dr.async_get(hass).async_get_device_by_identifier(
+        (DOMAIN, SERIAL), mock_config_entry.entry_id
+    )
     assert device is not None
     assert device.model == "NTP001"
     assert device.sw_version == "NTP001_R_00.01.02"
