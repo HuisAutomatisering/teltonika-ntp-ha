@@ -36,6 +36,10 @@
         "data": {
           "username": "Username",
           "password": "Password"
+        },
+        "data_description": {
+          "username": "A WebUI user. A dedicated read-only user for Home Assistant is recommended.",
+          "password": "Password of that user."
         }
       },
       "reconfigure": {
@@ -45,7 +49,14 @@
           "username": "Username",
           "password": "Password",
           "verify_ssl": "Verify SSL certificate"
-        }
+        },
+        "data_description": {
+          "host": "IP address or host name. HTTPS is tried first, then HTTP.",
+          "username": "A WebUI user. A dedicated read-only user for Home Assistant is recommended.",
+          "password": "Password of that user.",
+          "verify_ssl": "Leave off for the device's default self-signed certificate."
+        },
+        "description": "Change the address or credentials of the device."
       }
     },
     "error": {

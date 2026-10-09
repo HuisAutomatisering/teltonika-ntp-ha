@@ -12,7 +12,7 @@ from typing import Any
 
 import voluptuous as vol
 
-from homeassistant.config_entries import ConfigFlow, ConfigFlowResult
+from homeassistant.config_entries import ConfigEntry, ConfigFlow, ConfigFlowResult
 from homeassistant.const import CONF_HOST, CONF_PASSWORD, CONF_USERNAME, CONF_VERIFY_SSL
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import device_registry as dr
@@ -55,31 +55,19 @@ class InvalidAuth(Exception):
     """The credentials were rejected."""
 
 
-def _entry_ids_for_mac(hass: HomeAssistant, mac: str) -> list[str]:
-    """Return the config entry IDs of devices that have this MAC address.
+def _entry_for_mac(hass: HomeAssistant, mac: str) -> ConfigEntry | None:
+    """Return the entry of this integration whose device has the given MAC address.
 
-    Home Assistant 2026.x replaced ``async_get_device`` and
-    ``DeviceEntry.config_entries`` (a device now belongs to a single config entry).
-    Use the new API when it exists and fall back for older releases.
+    Walks the devices per config entry instead of looking the MAC up globally, which
+    works the same on every supported Home Assistant release.
     """
     registry = dr.async_get(hass)
-    connections = {(dr.CONNECTION_NETWORK_MAC, mac)}
-
-    get_devices = getattr(registry, "async_get_devices", None)
-    if get_devices is not None:
-        devices = list(get_devices(connections=connections))
-    else:
-        device = registry.async_get_device(connections=connections)
-        devices = [device] if device is not None else []
-
-    entry_ids: list[str] = []
-    for device in devices:
-        entry_id = getattr(device, "config_entry_id", None)
-        if entry_id is not None:
-            entry_ids.append(entry_id)
-        else:
-            entry_ids.extend(device.config_entries)
-    return entry_ids
+    connection = (dr.CONNECTION_NETWORK_MAC, mac)
+    for entry in hass.config_entries.async_entries(DOMAIN):
+        for device in dr.async_entries_for_config_entry(registry, entry.entry_id):
+            if connection in device.connections:
+                return entry
+    return None
 
 
 def _is_supported(model: str | None) -> bool:
@@ -194,11 +182,9 @@ class TeltonikaNtpConfigFlow(ConfigFlow, domain=DOMAIN):
         # Entries are keyed by serial number, which needs a login to read. Match a
         # device that is already set up by its MAC address instead.
         mac = dr.format_mac(discovery_info.macaddress)
-        for entry_id in _entry_ids_for_mac(self.hass, mac):
-            entry = self.hass.config_entries.async_get_entry(entry_id)
-            if entry is None or entry.domain != DOMAIN:
-                continue
+        if (entry := _entry_for_mac(self.hass, mac)) is not None:
             if entry.data.get(CONF_HOST) != base_url:
+                # The device got a new address: follow it.
                 self.hass.config_entries.async_update_entry(
                     entry, data={**entry.data, CONF_HOST: base_url}
                 )
@@ -209,7 +195,7 @@ class TeltonikaNtpConfigFlow(ConfigFlow, domain=DOMAIN):
         self._abort_if_unique_id_configured()
 
         self._discovered_host = host
-        name = public.get("device_name") or public.get("deviceName") or "Teltonika NTP"
+        name = public.get("device_name") or "Teltonika NTP"
         self.context["title_placeholders"] = {"name": str(name), "host": host}
         return await self.async_step_dhcp_confirm()
 

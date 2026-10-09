@@ -4,10 +4,12 @@
 [![HACS validation](https://github.com/HuisAutomatisering/teltonika-ntp-ha/actions/workflows/hacs.yml/badge.svg?branch=main)](https://github.com/HuisAutomatisering/teltonika-ntp-ha/actions/workflows/hacs.yml)
 [![CodeQL](https://github.com/HuisAutomatisering/teltonika-ntp-ha/actions/workflows/codeql.yml/badge.svg?branch=main)](https://github.com/HuisAutomatisering/teltonika-ntp-ha/actions/workflows/codeql.yml)
 [![Ruff](https://github.com/HuisAutomatisering/teltonika-ntp-ha/actions/workflows/ruff.yml/badge.svg?branch=main)](https://github.com/HuisAutomatisering/teltonika-ntp-ha/actions/workflows/ruff.yml)
+[![Tests](https://github.com/HuisAutomatisering/teltonika-ntp-ha/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/HuisAutomatisering/teltonika-ntp-ha/actions/workflows/tests.yml)
 
 [![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=HuisAutomatisering&repository=teltonika-ntp-ha&category=integration)
 
 [![HACS custom](https://img.shields.io/badge/HACS-custom-41BDF5.svg)](https://hacs.xyz/docs/faq/custom_repositories)
+[![Quality scale: Bronze (aligned)](https://img.shields.io/badge/quality%20scale-bronze%20(aligned)-cd7f32.svg)](https://developers.home-assistant.io/docs/core/integration-quality-scale/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Code style: Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 [![Release](https://img.shields.io/github/v/release/HuisAutomatisering/teltonika-ntp-ha?display_name=tag)](https://github.com/HuisAutomatisering/teltonika-ntp-ha/releases)
@@ -94,6 +96,35 @@ Make sure **Enable NTP server** is on in the device's **Time** settings.
 
 If the core Teltonika integration also discovered the device, ignore that discovery, or
 remove its entry so it stops retrying.
+
+## Removal
+
+1. Go to **Settings → Devices & services** and open **Teltonika NTP Server**.
+2. Open the menu (three dots) next to the device entry and choose **Delete**.
+3. To remove the files as well: in HACS, open **Teltonika NTP Server** and choose
+   **Remove**, or delete `custom_components/teltonika_ntp` for a manual installation.
+   Restart Home Assistant afterwards.
+
+Nothing is changed on the device itself. If you created a dedicated WebUI user for Home
+Assistant, you can delete it in the device's WebUI.
+
+## Quality scale
+
+This integration is aligned with the **Bronze** tier of the
+[Home Assistant integration quality scale](https://developers.home-assistant.io/docs/core/integration-quality-scale/).
+Home Assistant only grades integrations that ship with Home Assistant itself, so this is a
+self-assessment, not an official rating. The status per rule is recorded in
+[`quality_scale.yaml`](custom_components/teltonika_ntp/quality_scale.yaml).
+
+## Development
+
+The tests use [pytest-homeassistant-custom-component](https://github.com/MatthewFlamm/pytest-homeassistant-custom-component)
+and run on every push. To run them locally (Python 3.14):
+
+```bash
+pip install -r requirements_test.txt
+pytest --cov --cov-report=term-missing
+```
 
 ## Credits
 

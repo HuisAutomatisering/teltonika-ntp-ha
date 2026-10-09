@@ -9,6 +9,7 @@ below the rate limits NTP servers enforce.
 from __future__ import annotations
 
 import asyncio
+from collections.abc import Callable
 from dataclasses import dataclass
 import ipaddress
 import struct
@@ -180,15 +181,24 @@ class _NtpProtocol(asyncio.DatagramProtocol):
             self._reply.set_exception(NtpError(f"Network error: {exc}"))
 
 
+async def _create_endpoint(
+    loop: asyncio.AbstractEventLoop,
+    factory: Callable[[], asyncio.DatagramProtocol],
+    host: str,
+    port: int,
+) -> asyncio.DatagramTransport:
+    """Open a UDP socket connected to the server."""
+    transport, _ = await loop.create_datagram_endpoint(factory, remote_addr=(host, port))
+    return transport
+
+
 async def async_query(host: str, port: int = NTP_PORT, timeout: float = NTP_TIMEOUT) -> NtpResult:
     """Send one request to ``host`` and return the parsed reply."""
     loop = asyncio.get_running_loop()
     reply: asyncio.Future[tuple[bytes, float]] = loop.create_future()
 
     try:
-        transport, _ = await loop.create_datagram_endpoint(
-            lambda: _NtpProtocol(reply), remote_addr=(host, port)
-        )
+        transport = await _create_endpoint(loop, lambda: _NtpProtocol(reply), host, port)
     except OSError as err:
         raise NtpError(f"Cannot reach {host}:{port}: {err}") from err
 

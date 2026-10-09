@@ -36,6 +36,10 @@
         "data": {
           "username": "Gebruikersnaam",
           "password": "Wachtwoord"
+        },
+        "data_description": {
+          "username": "Een WebUI-gebruiker. Een aparte alleen-lezen gebruiker voor Home Assistant is aan te raden.",
+          "password": "Wachtwoord van die gebruiker."
         }
       },
       "reconfigure": {
@@ -45,7 +49,14 @@
           "username": "Gebruikersnaam",
           "password": "Wachtwoord",
           "verify_ssl": "SSL-certificaat controleren"
-        }
+        },
+        "data_description": {
+          "host": "IP-adres of hostnaam. Eerst wordt HTTPS geprobeerd, daarna HTTP.",
+          "username": "Een WebUI-gebruiker. Een aparte alleen-lezen gebruiker voor Home Assistant is aan te raden.",
+          "password": "Wachtwoord van die gebruiker.",
+          "verify_ssl": "Laat uit voor het standaard self-signed certificaat van het apparaat."
+        },
+        "description": "Wijzig het adres of de inloggegevens van het apparaat."
       }
     },
     "error": {
