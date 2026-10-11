@@ -6,7 +6,7 @@ Only the latest release receives fixes.
 
 | Version | Supported |
 | ------- | --------- |
-| 1.1.x   | Yes       |
+| 1.2.x   | Yes       |
 
 ## Reporting a vulnerability
 

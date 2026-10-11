@@ -33,6 +33,8 @@ servers instead and leaves routers to the core integration.
 | Synchronization | Sensor (enum) | `synchronized`, `unsynchronized`, `rate_limited` or `no_response` |
 | Stratum | Sensor | 1 when the server is locked to GNSS |
 | Reference | Sensor | Time source, for example `GPS` |
+| Last GPS sync | Sensor (timestamp) | When GPS last set the server clock (normally every ~16 s) |
+| Maximum error | Sensor (ms) | Worst-case error of the server clock; grows while GPS is lost |
 | Offset | Sensor (ms) | Server clock minus the Home Assistant host clock |
 | Round-trip delay | Sensor (ms, diagnostic) | Network round trip of the NTP query |
 | Root dispersion | Sensor (ms, diagnostic) | Error estimate the server reports for its own time |
@@ -59,6 +61,46 @@ Home Assistant host also uses this server as its own time source, and something 
 the same IP address sends bursts (`sntp`, `ntpdate`), the server may answer `RATE` for a
 while. The Synchronization sensor then shows **Rate limited**, which says nothing bad about
 the server itself.
+
+## Holdover monitoring
+
+When the NTP001 loses GPS (a disconnected antenna, snow on it, a blocked view of the sky), it
+keeps serving time from its own crystal. That is called holdover. Two sensors show it:
+
+- **Last GPS sync** stops moving. It is the reference timestamp from the NTP reply: the
+  moment GPS last set the server clock. While GPS is fine it updates every ~16 seconds.
+- **Maximum error** starts climbing. It is the NTP root distance (RFC 5905): half the root
+  delay plus the root dispersion, plus 15 µs for every second since the last GPS update,
+  the drift NTP allows an undisciplined clock. One hour without GPS adds 54 ms.
+
+Maximum error is an upper bound, not a measurement: the real drift is usually much smaller,
+but without GPS there is nothing to measure it against. Weather barely matters for GPS
+timing, so do not expect these values to follow the forecast.
+
+The **Offset** sensor compares the server with the Home Assistant host, so it mostly shows
+how well the Home Assistant host keeps time and how symmetric the network path is.
+
+### Example: notify when GPS is lost
+
+```yaml
+alias: NTP server lost GPS
+triggers:
+  - trigger: template
+    value_template: >-
+      {{ states('sensor.ntp001_last_gps_sync') not in ['unknown', 'unavailable']
+         and now() - as_datetime(states('sensor.ntp001_last_gps_sync'))
+             > timedelta(minutes=5) }}
+actions:
+  - action: notify.notify
+    data:
+      title: NTP server in holdover
+      message: >-
+        No GPS update since
+        {{ as_local(as_datetime(states('sensor.ntp001_last_gps_sync'))).strftime('%H:%M') }}.
+        Maximum error is now {{ states('sensor.ntp001_maximum_error') }} ms.
+```
+
+Adjust the entity IDs if your device has another name.
 
 ## Limitations
 

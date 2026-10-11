@@ -23,6 +23,12 @@
       },
       "root_dispersion": {
         "default": "mdi:chart-bell-curve"
+      },
+      "last_gps_sync": {
+        "default": "mdi:satellite-uplink"
+      },
+      "max_error": {
+        "default": "mdi:arrow-expand-horizontal"
       }
     },
     "binary_sensor": {

@@ -25,6 +25,10 @@ LEAP_ALARM = 3  # leap indicator 3: clock not synchronized
 STRATUM_KISS = 0  # stratum 0 in a reply: kiss-o'-death packet
 STRATUM_UNSYNCHRONIZED = 16
 
+# Frequency tolerance of an NTP clock (RFC 5905): an undisciplined clock is assumed to
+# drift at most 15 microseconds per second, so the error bound grows by this rate.
+PHI = 15e-6
+
 MODE_CLIENT = 3
 MODE_SERVER = 4
 VERSION = 4
@@ -57,11 +61,34 @@ class NtpResult:
     kiss_code: str | None
     offset: float | None  # seconds, server clock minus local clock
     delay: float | None  # seconds, round trip
+    reference_time: float | None = None  # Unix time the server clock was last set
+    server_time: float | None = None  # Unix time the server sent the reply
 
     @property
     def is_kiss_of_death(self) -> bool:
         """Return True when the server refused to serve us (for example RATE)."""
         return self.kiss_code is not None
+
+    @property
+    def reference_age(self) -> float | None:
+        """Return the seconds between the last clock update and the reply."""
+        if self.reference_time is None or self.server_time is None:
+            return None
+        return max(0.0, self.server_time - self.reference_time)
+
+    @property
+    def max_error(self) -> float | None:
+        """Return the worst-case error of the server clock in seconds.
+
+        This is the NTP root distance (RFC 5905): half the root delay plus the root
+        dispersion, plus the dispersion that builds up since the last clock update
+        at the rate PHI. While the reference (GPS) is lost this keeps growing, which
+        makes it the error bound of the clock in holdover.
+        """
+        age = self.reference_age
+        if self.is_kiss_of_death or age is None:
+            return None
+        return self.root_delay / 2 + self.root_dispersion + PHI * age
 
     @property
     def is_synchronized(self) -> bool:
@@ -124,7 +151,7 @@ def parse_response(data: bytes, request_transmit: int, received: float) -> NtpRe
         root_delay,
         root_dispersion,
         ref_id,
-        _reference,
+        reference,
         origin,
         receive,
         transmit,
@@ -143,7 +170,12 @@ def parse_response(data: bytes, request_transmit: int, received: float) -> NtpRe
 
     offset: float | None = None
     delay: float | None = None
+    reference_time: float | None = None
+    server_time: float | None = None
+    if kiss_code is None and reference:
+        reference_time = _from_ntp(reference)
     if kiss_code is None and transmit:
+        server_time = _from_ntp(transmit)
         t1 = _from_ntp(request_transmit)
         t2 = _from_ntp(receive)
         t3 = _from_ntp(transmit)
@@ -163,6 +195,8 @@ def parse_response(data: bytes, request_transmit: int, received: float) -> NtpRe
         kiss_code=kiss_code,
         offset=offset,
         delay=delay,
+        reference_time=reference_time,
+        server_time=server_time,
     )
 
 

@@ -23,6 +23,7 @@ def _reply(
     shift: float = 0.0,
     kiss: bool = False,
     mode: int = 4,
+    ref_age: float | None = 0.0,
 ) -> bytes:
     """Build a server reply to ``request``; ``shift`` moves the server clock."""
     origin = _PACKET.unpack(request)[-1]
@@ -30,7 +31,8 @@ def _reply(
     if kiss:
         return _PACKET.pack((3 << 6) | (4 << 3) | 4, 0, 3, 0, 0, 0, b"RATE", 0, origin, origin, 0)
     first = (leap << 6) | (4 << 3) | mode
-    return _PACKET.pack(first, stratum, 4, -20, 0, 76, ref, now, origin, now, now)
+    reference = 0 if ref_age is None else ntp._to_ntp(time.time() + shift - ref_age)
+    return _PACKET.pack(first, stratum, 4, -20, 0, 76, ref, reference, origin, now, now)
 
 
 def _parse(reply: bytes, request: bytes) -> ntp.NtpResult:
@@ -50,6 +52,36 @@ def test_synchronized_gps_server() -> None:
     assert result.root_dispersion == pytest.approx(76 / 2**16)
 
 
+def test_reference_time_and_max_error() -> None:
+    """The last clock update is parsed and the error bound includes its age."""
+    request = ntp.build_request(time.time())
+    result = _parse(_reply(request, ref_age=16), request)
+
+    assert result.reference_age == pytest.approx(16, abs=0.01)
+    expected = 76 / 2**16 + ntp.PHI * 16  # root dispersion + 16 s of drift allowance
+    assert result.max_error == pytest.approx(expected, abs=1e-6)
+
+
+def test_max_error_grows_in_holdover() -> None:
+    """One hour without GPS adds 54 ms to the error bound."""
+    request = ntp.build_request(time.time())
+    fresh = _parse(_reply(request, ref_age=0), request)
+    request = ntp.build_request(time.time())
+    holdover = _parse(_reply(request, ref_age=3600), request)
+
+    assert holdover.max_error - fresh.max_error == pytest.approx(0.054, abs=1e-4)
+
+
+def test_no_reference_time() -> None:
+    """A server that was never set reports no reference time and no error bound."""
+    request = ntp.build_request(time.time())
+    result = _parse(_reply(request, leap=3, stratum=16, ref=b"INIT", ref_age=None), request)
+
+    assert result.reference_time is None
+    assert result.reference_age is None
+    assert result.max_error is None
+
+
 def test_kiss_of_death_rate() -> None:
     """A RATE kiss-o'-death packet, as the NTP001 sends it, is recognised."""
     request = ntp.build_request(time.time())
@@ -60,6 +92,8 @@ def test_kiss_of_death_rate() -> None:
     assert not result.is_synchronized
     assert result.offset is None
     assert result.delay is None
+    assert result.reference_time is None
+    assert result.max_error is None
 
 
 def test_unsynchronized_server() -> None:

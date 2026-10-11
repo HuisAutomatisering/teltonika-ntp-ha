@@ -60,6 +60,8 @@ NTP_SYNCHRONIZED = NtpResult(
     kiss_code=None,
     offset=0.0002,
     delay=0.004,
+    reference_time=1_791_000_000.0,
+    server_time=1_791_000_010.0,
 )
 
 

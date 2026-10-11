@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from datetime import UTC, datetime
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest
@@ -45,6 +46,11 @@ async def test_setup_and_unload(
     assert hass.states.get("sensor.ntp001_stratum").state == "1"
     assert hass.states.get("sensor.ntp001_reference").state == "GPS"
     assert float(hass.states.get("sensor.ntp001_offset").state) == pytest.approx(0.2)
+    assert hass.states.get("sensor.ntp001_last_gps_sync").state == (
+        datetime.fromtimestamp(1_791_000_000, tz=UTC).isoformat()
+    )
+    # 1.3 ms root dispersion plus 10 s since the last update at 15 us/s.
+    assert float(hass.states.get("sensor.ntp001_maximum_error").state) == pytest.approx(1.45)
     assert hass.states.get("binary_sensor.ntp001_ntp_service").state == STATE_ON
     assert hass.states.get("binary_sensor.ntp001_time_sync").state == STATE_OFF
 
@@ -139,3 +145,5 @@ async def test_sync_states(
     assert hass.states.get("sensor.ntp001_synchronization").state == sync_state
     assert hass.states.get("binary_sensor.ntp001_ntp_service").state == service_state
     assert hass.states.get("binary_sensor.ntp001_time_sync").state == STATE_ON
+    assert hass.states.get("sensor.ntp001_last_gps_sync").state == "unknown"
+    assert hass.states.get("sensor.ntp001_maximum_error").state == "unknown"

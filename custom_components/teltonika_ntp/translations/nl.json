@@ -98,6 +98,12 @@
       },
       "root_dispersion": {
         "name": "Root-dispersie"
+      },
+      "last_gps_sync": {
+        "name": "Laatste GPS-sync"
+      },
+      "max_error": {
+        "name": "Maximale afwijking"
       }
     },
     "binary_sensor": {
